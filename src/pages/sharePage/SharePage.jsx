@@ -17,7 +17,9 @@ export default function SharePage({ capturedVideo, gender }) {
   // console.log("filename =>", filename);
   // console.log("gender =>", gender);
 
-  window.alert(generatedVideo);
+  useEffect(() => {
+    window.alert(generatedVideo);
+  }, [generatedVideo]);
 
   const uploadVideo = async () => {
     try {
