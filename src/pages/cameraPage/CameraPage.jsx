@@ -30,8 +30,7 @@ export default function CameraPage({ setCapturedVideo }) {
 
   // Simplified options to avoid Safari compatibility issues
   const options = {
-    videoBitsPerSecond: 2500000,
-    // mimeType: "video/webm; codecs=vp9",
+    mimeType: "video/webm;codecs=vp9", // Use a more broadly supported format
   };
 
   // Stop recording and save the video
@@ -39,7 +38,7 @@ export default function CameraPage({ setCapturedVideo }) {
     setIsRecording(false);
     mediaRecorderRef.current.stop();
     mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/mp4" });
+      const blob = new Blob(chunksRef.current, { type: "video/webm" });
       const url = URL.createObjectURL(blob);
 
       setVideoBlob(blob);
@@ -51,28 +50,41 @@ export default function CameraPage({ setCapturedVideo }) {
   // Handle start recording
   const handleStartRecording = () => {
     setIsRecording(true);
-    setTimeout(() => {
-      console.log("recording started");
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then((stream) => {
-          mediaRecorderRef.current = new MediaRecorder(stream, options);
-          mediaRecorderRef.current.start();
-          mediaRecorderRef.current.ondataavailable = (e) => {
-            chunksRef.current.push(e.data);
-          };
-          setTimeout(() => {
-            stopRecording();
-          }, 4000);
-        })
-        .catch((err) => {
-          console.error("Error accessing webcam: ", err);
-          toast.error(
-            "Failed to access webcam. Please check your camera permissions.",
-            toastOptions
-          );
-        });
-    }, 2000);
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        mediaRecorderRef.current = new MediaRecorder(stream, options);
+
+        // Event listeners for debugging
+        mediaRecorderRef.current.onstart = () => {
+          console.log("Recording started");
+        };
+
+        mediaRecorderRef.current.onpause = () => {
+          console.log("Recording paused");
+        };
+
+        mediaRecorderRef.current.onerror = (event) => {
+          console.error("Recording error:", event.error);
+          toast.error("Recording error occurred", toastOptions);
+        };
+
+        mediaRecorderRef.current.start();
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          chunksRef.current.push(e.data);
+        };
+
+        setTimeout(() => {
+          stopRecording();
+        }, 5000); // Increased timeout from 4000ms to 5000ms
+      })
+      .catch((err) => {
+        console.error("Error accessing webcam: ", err);
+        toast.error(
+          "Failed to access webcam. Please check your camera permissions.",
+          toastOptions
+        );
+      });
   };
 
   // Handle retake
@@ -104,7 +116,7 @@ export default function CameraPage({ setCapturedVideo }) {
   const onVideoLoad = (e) => {
     let video = e.target;
     if (video.videoWidth > video.videoHeight) {
-      // window.alert("Change your camera orientation");
+      window.alert("Change your camera orientation");
     }
   };
 
@@ -130,7 +142,7 @@ export default function CameraPage({ setCapturedVideo }) {
               className={styles.capturedVideo}
               onError={(e) => console.error("Video playback error:", e)}
             >
-              <source src={previewUrl} type="video/mp4" />
+              <source src={previewUrl} type="video/webm" />
             </video>
           )}
         </div>
