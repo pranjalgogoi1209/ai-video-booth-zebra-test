@@ -31,6 +31,7 @@ export default function CameraPage({ setCapturedVideo }) {
   // Simplified options to avoid Safari compatibility issues
   const options = {
     videoBitsPerSecond: 2500000,
+    mimeType: "video/webm; codecs=vp9",
   };
 
   // Stop recording and save the video
