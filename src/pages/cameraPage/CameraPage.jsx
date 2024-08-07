@@ -30,7 +30,7 @@ export default function CameraPage({ setCapturedVideo }) {
 
   // Simplified options to avoid Safari compatibility issues
   const options = {
-    mimeType: "video/webm;codecs=vp9", // Use a more broadly supported format
+    videoBitsPerSecond: 2500000,
   };
 
   // Stop recording and save the video
@@ -38,7 +38,7 @@ export default function CameraPage({ setCapturedVideo }) {
     setIsRecording(false);
     mediaRecorderRef.current.stop();
     mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      const blob = new Blob(chunksRef.current, { type: "video/mp4" });
       const url = URL.createObjectURL(blob);
 
       setVideoBlob(blob);
@@ -51,33 +51,19 @@ export default function CameraPage({ setCapturedVideo }) {
   const handleStartRecording = () => {
     setIsRecording(true);
     setTimeout(() => {
+      console.log("recording started");
+
       navigator.mediaDevices
         .getUserMedia(constraints)
         .then((stream) => {
           mediaRecorderRef.current = new MediaRecorder(stream, options);
-
-          // Event listeners for debugging
-          mediaRecorderRef.current.onstart = () => {
-            console.log("Recording started");
-          };
-
-          mediaRecorderRef.current.onpause = () => {
-            console.log("Recording paused");
-          };
-
-          mediaRecorderRef.current.onerror = (event) => {
-            console.error("Recording error:", event.error);
-            toast.error("Recording error occurred", toastOptions);
-          };
-
           mediaRecorderRef.current.start();
           mediaRecorderRef.current.ondataavailable = (e) => {
             chunksRef.current.push(e.data);
           };
-
           setTimeout(() => {
             stopRecording();
-          }, 5000); // Increased timeout from 4000ms to 5000ms
+          }, 4000);
         })
         .catch((err) => {
           console.error("Error accessing webcam: ", err);
@@ -144,7 +130,7 @@ export default function CameraPage({ setCapturedVideo }) {
               className={styles.capturedVideo}
               onError={(e) => console.error("Video playback error:", e)}
             >
-              <source src={previewUrl} type="video/webm" />
+              <source src={previewUrl} type="video/mp4" />
             </video>
           )}
         </div>
