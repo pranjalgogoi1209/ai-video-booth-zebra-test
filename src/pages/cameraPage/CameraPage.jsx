@@ -8,60 +8,56 @@ import Webcam from "react-webcam";
 import logo from "./../../assets/header/logo.png";
 
 export default function CameraPage({ setCapturedVideo }) {
-  // const webRef = useRef();
   const navigate = useNavigate();
   const [isRecording, setIsRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // previewUrl && console.log(previewUrl);
-  // videoBlob && console.log(videoBlob);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
 
+  // Video constraints with basic configuration to support Safari
   const videoConstraints = {
     width: 720,
     height: 405,
     facingMode: "user",
   };
 
-  var constraints = {
+  const constraints = {
     audio: false,
-    video: {
-      width: { min: 720, max: 720 },
-      height: { min: 405, max: 405 },
-    },
+    video: true,
   };
 
+  // Simplified options to avoid Safari compatibility issues
   const options = {
     videoBitsPerSecond: 2500000,
-    mimeType: "video/webm; codecs=vp9",
+    // mimeType: "video/webm; codecs=vp9",
   };
 
-  let mediaRecorder;
-  const chunks = [];
-
-  // stop recording
+  // Stop recording and save the video
   const stopRecording = () => {
     setIsRecording(false);
-    mediaRecorder.stop();
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "video/mp4" });
+    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: "video/mp4" });
       const url = URL.createObjectURL(blob);
 
       setVideoBlob(blob);
       setPreviewUrl(url);
+      chunksRef.current = []; // Clear the chunks for future recordings
     };
   };
 
-  // handle start recording
+  // Handle start recording
   const handleStartRecording = () => {
     setIsRecording(true);
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then((stream) => {
-        mediaRecorder = new MediaRecorder(stream, options);
-        mediaRecorder.start();
-        mediaRecorder.ondataavailable = (e) => {
-          chunks.push(e.data);
+        mediaRecorderRef.current = new MediaRecorder(stream, options);
+        mediaRecorderRef.current.start();
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          chunksRef.current.push(e.data);
         };
         setTimeout(() => {
           stopRecording();
@@ -69,16 +65,20 @@ export default function CameraPage({ setCapturedVideo }) {
       })
       .catch((err) => {
         console.error("Error accessing webcam: ", err);
+        toast.error(
+          "Failed to access webcam. Please check your camera permissions.",
+          toastOptions
+        );
       });
   };
 
-  // handle retake
+  // Handle retake
   const handleRetake = () => {
     setPreviewUrl(null);
     setVideoBlob(null);
   };
 
-  // toast options
+  // Toast options
   const toastOptions = {
     position: "top-left",
     autoClose: 4000,
@@ -87,9 +87,8 @@ export default function CameraPage({ setCapturedVideo }) {
     theme: "light",
   };
 
-  // handle submit
+  // Handle submit
   const handleSubmit = () => {
-    // console.log("captured video submitting");
     if (videoBlob) {
       setCapturedVideo(videoBlob);
       navigate("/share");
@@ -98,11 +97,11 @@ export default function CameraPage({ setCapturedVideo }) {
     }
   };
 
+  // Handle video load to check orientation (optional, can customize as needed)
   const onVideoLoad = (e) => {
     let video = e.target;
     if (video.videoWidth > video.videoHeight) {
-      // navigate("/");
-      window.alert("Change your camera");
+      // window.alert("Change your camera orientation");
     }
   };
 
@@ -167,6 +166,8 @@ export default function CameraPage({ setCapturedVideo }) {
       <Link to={"/"} className={styles.logoContainer}>
         <img src={logo} alt="logo" />
       </Link>
+
+      <ToastContainer />
     </div>
   );
 }
