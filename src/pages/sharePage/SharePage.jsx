@@ -17,12 +17,6 @@ export default function SharePage({ capturedVideo, gender }) {
   // console.log("filename =>", filename);
   // console.log("gender =>", gender);
 
-  /*   useEffect(() => {
-    window.alert(generatedVideo);
-  }, [generatedVideo]); */
-
-  window.alert(capturedVideo);
-
   const uploadVideo = async () => {
     try {
       let filename = v4() + ".webm";
@@ -34,11 +28,9 @@ export default function SharePage({ capturedVideo, gender }) {
       setGeneratedVideo(true);
       setVideoUrl(videoUrl);
       setFilename(filename);
-      alert("working properly");
     } catch (error) {
       console.log(error);
       setGeneratedVideo(false);
-      alert("getting error firebase");
     }
   };
 
