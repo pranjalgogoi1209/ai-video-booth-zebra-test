@@ -50,41 +50,43 @@ export default function CameraPage({ setCapturedVideo }) {
   // Handle start recording
   const handleStartRecording = () => {
     setIsRecording(true);
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream) => {
-        mediaRecorderRef.current = new MediaRecorder(stream, options);
+    setTimeout(() => {
+      navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then((stream) => {
+          mediaRecorderRef.current = new MediaRecorder(stream, options);
 
-        // Event listeners for debugging
-        mediaRecorderRef.current.onstart = () => {
-          console.log("Recording started");
-        };
+          // Event listeners for debugging
+          mediaRecorderRef.current.onstart = () => {
+            console.log("Recording started");
+          };
 
-        mediaRecorderRef.current.onpause = () => {
-          console.log("Recording paused");
-        };
+          mediaRecorderRef.current.onpause = () => {
+            console.log("Recording paused");
+          };
 
-        mediaRecorderRef.current.onerror = (event) => {
-          console.error("Recording error:", event.error);
-          toast.error("Recording error occurred", toastOptions);
-        };
+          mediaRecorderRef.current.onerror = (event) => {
+            console.error("Recording error:", event.error);
+            toast.error("Recording error occurred", toastOptions);
+          };
 
-        mediaRecorderRef.current.start();
-        mediaRecorderRef.current.ondataavailable = (e) => {
-          chunksRef.current.push(e.data);
-        };
+          mediaRecorderRef.current.start();
+          mediaRecorderRef.current.ondataavailable = (e) => {
+            chunksRef.current.push(e.data);
+          };
 
-        setTimeout(() => {
-          stopRecording();
-        }, 5000); // Increased timeout from 4000ms to 5000ms
-      })
-      .catch((err) => {
-        console.error("Error accessing webcam: ", err);
-        toast.error(
-          "Failed to access webcam. Please check your camera permissions.",
-          toastOptions
-        );
-      });
+          setTimeout(() => {
+            stopRecording();
+          }, 5000); // Increased timeout from 4000ms to 5000ms
+        })
+        .catch((err) => {
+          console.error("Error accessing webcam: ", err);
+          toast.error(
+            "Failed to access webcam. Please check your camera permissions.",
+            toastOptions
+          );
+        });
+    }, 2000);
   };
 
   // Handle retake
