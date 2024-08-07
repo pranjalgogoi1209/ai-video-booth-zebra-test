@@ -1,0 +1,6 @@
+.HomePage {
+  /* border: 2px solid orange; */
+  width: 100%;
+  height: calc(100dvh - 24dvh);
+  gap: 40vw;
+}

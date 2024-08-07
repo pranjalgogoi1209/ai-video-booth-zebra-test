@@ -1,0 +1,11 @@
+.SharePage {
+  /* border: 2px solid orange; */
+  width: 100%;
+  height: calc(100dvh - 24dvh);
+  gap: 20vw;
+  justify-content: flex-start !important;
+  padding-top: 10vw;
+  .generatedVideoContainer {
+    gap: 15vw;
+  }
+}

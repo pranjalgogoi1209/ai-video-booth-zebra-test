@@ -1,0 +1,8 @@
+.Header {
+  /* border: 1px solid green; */
+  padding: 4vw;
+  height: 24vh;
+  .logoContainer {
+    width: 15vw;
+  }
+}

@@ -1,0 +1,9 @@
+.GenderPage {
+  /* border: 1px solid orange; */
+  width: 100%;
+  height: calc(100dvh - 24dvh);
+  gap: 35vw;
+  .btnContainer {
+    gap: 5vw;
+  }
+}
