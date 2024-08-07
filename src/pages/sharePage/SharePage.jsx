@@ -18,6 +18,7 @@ export default function SharePage({ capturedVideo, gender }) {
   // console.log("gender =>", gender);
 
   const uploadVideo = async () => {
+    window.alert("firebase api calling");
     try {
       let filename = v4() + ".webm";
 
