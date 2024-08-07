@@ -21,6 +21,8 @@ export default function SharePage({ capturedVideo, gender }) {
     window.alert(generatedVideo);
   }, [generatedVideo]); */
 
+  window.alert(capturedVideo);
+
   const uploadVideo = async () => {
     try {
       let filename = v4() + ".webm";
