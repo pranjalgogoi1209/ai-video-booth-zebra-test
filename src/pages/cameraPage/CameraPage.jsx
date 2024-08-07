@@ -16,7 +16,7 @@ export default function CameraPage({ setCapturedVideo }) {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
 
-  // Video constraints with basic configuration to support Safari
+  // Video constraints with more specific configuration
   const videoConstraints = {
     width: 720,
     height: 405,
@@ -25,26 +25,25 @@ export default function CameraPage({ setCapturedVideo }) {
 
   const constraints = {
     audio: false,
-    video: true,
+    video: {
+      width: { ideal: 720 },
+      height: { ideal: 405 },
+      frameRate: { ideal: 30, max: 30 }, // Added frame rate constraints
+    },
   };
 
-  // Simplified options to avoid Safari compatibility issues
-  const options = {
-    videoBitsPerSecond: 2500000,
-  };
+  // Simplified options to avoid Safari and Firefox compatibility issues
+  const options = {}; // Removed videoBitsPerSecond for compatibility
 
   // Stop recording and save the video
   const stopRecording = () => {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      mediaRecorderRef.current.stop();
+    }
     setIsRecording(false);
-    mediaRecorderRef.current.stop();
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/mp4" });
-      const url = URL.createObjectURL(blob);
-
-      setVideoBlob(blob);
-      setPreviewUrl(url);
-      chunksRef.current = []; // Clear the chunks for future recordings
-    };
   };
 
   // Handle start recording
@@ -54,13 +53,24 @@ export default function CameraPage({ setCapturedVideo }) {
       .getUserMedia(constraints)
       .then((stream) => {
         mediaRecorderRef.current = new MediaRecorder(stream, options);
-        mediaRecorderRef.current.start();
+
         mediaRecorderRef.current.ondataavailable = (e) => {
           chunksRef.current.push(e.data);
         };
+
+        mediaRecorderRef.current.onstop = () => {
+          const blob = new Blob(chunksRef.current, { type: "video/mp4" });
+          const url = URL.createObjectURL(blob);
+          setVideoBlob(blob);
+          setPreviewUrl(url);
+          chunksRef.current = []; // Clear the chunks for future recordings
+        };
+
+        mediaRecorderRef.current.start(1000); // Argument indicates time slice (ms) for dataavailable events
+
         setTimeout(() => {
           stopRecording();
-        }, 4000);
+        }, 4000); // Stop after 4 seconds
       })
       .catch((err) => {
         console.error("Error accessing webcam: ", err);
