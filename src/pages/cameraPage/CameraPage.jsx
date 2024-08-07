@@ -51,25 +51,28 @@ export default function CameraPage({ setCapturedVideo }) {
   // Handle start recording
   const handleStartRecording = () => {
     setIsRecording(true);
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream) => {
-        mediaRecorderRef.current = new MediaRecorder(stream, options);
-        mediaRecorderRef.current.start();
-        mediaRecorderRef.current.ondataavailable = (e) => {
-          chunksRef.current.push(e.data);
-        };
-        setTimeout(() => {
-          stopRecording();
-        }, 4000);
-      })
-      .catch((err) => {
-        console.error("Error accessing webcam: ", err);
-        toast.error(
-          "Failed to access webcam. Please check your camera permissions.",
-          toastOptions
-        );
-      });
+    setTimeout(() => {
+      console.log("recording started");
+      navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then((stream) => {
+          mediaRecorderRef.current = new MediaRecorder(stream, options);
+          mediaRecorderRef.current.start();
+          mediaRecorderRef.current.ondataavailable = (e) => {
+            chunksRef.current.push(e.data);
+          };
+          setTimeout(() => {
+            stopRecording();
+          }, 4000);
+        })
+        .catch((err) => {
+          console.error("Error accessing webcam: ", err);
+          toast.error(
+            "Failed to access webcam. Please check your camera permissions.",
+            toastOptions
+          );
+        });
+    }, 2000);
   };
 
   // Handle retake
