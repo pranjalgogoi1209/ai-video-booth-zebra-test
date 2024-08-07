@@ -17,9 +17,9 @@ export default function SharePage({ capturedVideo, gender }) {
   // console.log("filename =>", filename);
   // console.log("gender =>", gender);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     window.alert(generatedVideo);
-  }, [generatedVideo]);
+  }, [generatedVideo]); */
 
   const uploadVideo = async () => {
     try {
@@ -32,10 +32,11 @@ export default function SharePage({ capturedVideo, gender }) {
       setGeneratedVideo(true);
       setVideoUrl(videoUrl);
       setFilename(filename);
+      alert("working properly");
     } catch (error) {
       console.log(error);
       setGeneratedVideo(false);
-      // setGeneratedVideo(true);
+      alert("getting error firebase");
     }
   };
 
